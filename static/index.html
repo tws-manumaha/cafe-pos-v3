@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0f172a">
+<title>Cafe POS</title>
+<link rel="manifest" href="/static/manifest.webmanifest">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div id="login">
+  <div class="card">
+    <h1>Cafe POS</h1><p>Sign in to start billing</p>
+    <input id="u" placeholder="Username" autocomplete="username">
+    <input id="p" type="password" placeholder="Password" autocomplete="current-password">
+    <button onclick="doLogin()">Sign in</button>
+    <div class="err" id="loginErr"></div>
+    <p class="muted" style="margin-top:14px">Demo: owner / owner123</p>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+  <header>
+    <div class="brand">Cafe POS</div>
+    <nav id="nav">
+      <button data-v="dashboard" class="active">Dashboard</button>
+      <button data-v="billing">Billing</button>
+      <button data-v="kitchen">Kitchen</button>
+      <button data-v="tables">Tables</button>
+      <button data-v="orders">Orders</button>
+      <button data-v="inventory">Inventory</button>
+      <button data-v="purchases">Purchases</button>
+      <button data-v="stock">Stock ops</button>
+      <button data-v="menu">Menu</button>
+      <button data-v="marketing">Offers</button>
+      <button data-v="reports">Reports</button>
+      <button data-v="admin">Admin</button>
+    </nav>
+    <div id="offlineBar" class="hidden" style="background:#ef4444;color:#fff;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:700">OFFLINE — bills are being queued</div>
+    <div class="who"><span id="whoName"></span>
+      <button onclick="logout()" style="background:#ffffff14;color:#e2e8f0">Logout</button></div>
+  </header>
+
+  <main>
+    <section id="v-dashboard">
+      <h2>Today at a glance</h2>
+      <div class="grid cards" id="kpis"></div>
+      <h2 style="margin-top:22px">Low stock</h2>
+      <div class="panel"><table id="lowStock"><tbody></tbody></table></div>
+    </section>
+
+    <section id="v-billing" class="hidden">
+      <div class="toolbar">
+        <input id="search" placeholder="Search dish…" oninput="renderDishes()">
+        <select id="catFilter" onchange="renderDishes()"><option value="">All categories</option></select>
+        <span class="muted" id="dishCount"></span>
+      </div>
+      <div class="bill-wrap">
+        <div>
+          <div id="comboRow" class="toolbar" style="margin-bottom:10px"></div>
+          <div class="dishgrid" id="dishGrid"></div>
+        </div>
+        <div class="cart">
+          <h3>Current bill</h3>
+          <div id="cartLines"><p class="muted">No items yet — tap a dish.</p></div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <input id="discPct" type="number" min="0" max="100" placeholder="Disc %" style="width:80px" oninput="renderCart()">
+            <input id="offerCode" placeholder="Offer code" style="flex:1" oninput="renderCart()">
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <input id="custPhone" placeholder="Customer phone (loyalty)" style="flex:1">
+            <select id="channel" style="width:110px">
+              <option value="dine-in">Dine-in</option><option value="takeaway">Takeaway</option>
+            </select>
+          </div>
+          <div class="tot" id="cartTotals"></div>
+          <button class="charge" onclick="charge()">Charge &amp; print</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="v-kitchen" class="hidden">
+      <div class="toolbar"><h2 style="margin:0">Kitchen board</h2>
+        <span class="muted">Pending → Preparing → Ready → Served</span></div>
+      <div class="grid" id="kotBoard" style="grid-template-columns:repeat(auto-fill,minmax(230px,1fr))"></div>
+    </section>
+
+    <section id="v-tables" class="hidden">
+      <div class="toolbar"><h2 style="margin:0">Tables</h2><span class="muted">Tap a table to toggle status</span></div>
+      <div class="grid" id="tableGrid" style="grid-template-columns:repeat(auto-fill,minmax(140px,1fr))"></div>
+    </section>
+
+    <section id="v-orders" class="hidden">
+      <div class="toolbar"><h2 style="margin:0">Orders</h2><input type="date" id="orderDate" onchange="loadOrders()"></div>
+      <div class="panel"><table id="ordersTable"><tbody></tbody></table></div>
+    </section>
+
+    <section id="v-inventory" class="hidden">
+      <div class="toolbar"><h2 style="margin:0">Inventory</h2>
+        <input id="invSearch" placeholder="Search ingredient…" oninput="renderInventory()"></div>
+      <div class="panel"><table id="invTable"><tbody></tbody></table></div>
+    </section>
+
+    <section id="v-purchases" class="hidden">
+      <div class="toolbar"><h2 style="margin:0">Purchases</h2>
+        <button style="background:var(--accent);color:#111;font-weight:700" onclick="newPO()">New purchase order</button></div>
+      <div class="panel" style="margin-bottom:14px">
+        <h3 style="margin-top:0">New purchase order</h3>
+        <div class="toolbar"><select id="poSupplier"></select>
+          <button class="qbtn" onclick="addPoLine()">+ Add line</button></div>
+        <table id="poEditor"><thead><tr><th>Ingredient</th><th>Qty</th><th>Rate</th><th></th></tr></thead><tbody></tbody></table>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+          <b id="poTotal">Total: ₹0.00</b>
+          <button class="charge" style="width:auto;padding:10px 20px" onclick="submitPO()">Create purchase order</button>
+        </div>
+      </div>
+      <div class="grid" style="grid-template-columns:1fr 1fr;gap:14px">
+        <div class="panel"><h3 style="margin-top:0">Purchase orders</h3><table id="poTable"><tbody></tbody></table></div>
+        <div class="panel"><h3 style="margin-top:0">Suppliers</h3><table id="supTable"><tbody></tbody></table></div>
+      </div>
+    </section>
+
+
+    <section id="v-stock" class="hidden">
+      <h2>Stock take &amp; wastage</h2>
+      <div class="grid" style="grid-template-columns:1.2fr 1fr;gap:14px">
+        <div class="panel">
+          <h3 style="margin-top:0">Stock take <span class="muted">— enter the counted quantity</span></h3>
+          <div class="toolbar"><input id="stSearch" placeholder="Filter ingredient…" oninput="renderStockTake()"></div>
+          <div style="max-height:52vh;overflow:auto"><table id="stTable"><tbody></tbody></table></div>
+          <button class="charge" style="margin-top:10px" onclick="submitStockTake()">Post stock take</button>
+        </div>
+        <div class="panel">
+          <h3 style="margin-top:0">Record wastage</h3>
+          <input id="wIng" placeholder="Ingredient code (e.g. V01)" style="width:100%;margin-bottom:8px">
+          <input id="wQty" type="number" placeholder="Quantity" style="width:100%;margin-bottom:8px">
+          <select id="wReason" style="width:100%;margin-bottom:8px">
+            <option>spoilage</option><option>breakage</option><option>staff meal</option>
+            <option>expired</option><option>other</option>
+          </select>
+          <button class="charge" onclick="submitWastage()">Record wastage</button>
+          <div class="muted" style="margin-top:10px">Wastage reduces stock and is logged in the audit trail.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="v-menu" class="hidden">
+      <div class="toolbar"><h2 style="margin:0">Menu &amp; margins</h2>
+        <input id="menuSearch" placeholder="Search dish…" oninput="renderMenu()"></div>
+      <div class="panel"><table id="menuTable"><tbody></tbody></table></div>
+    </section>
+
+    <section id="v-marketing" class="hidden">
+      <div class="toolbar"><h2 style="margin:0">Offers &amp; combos</h2>
+        <button style="background:var(--accent);color:#111;font-weight:700" onclick="newOffer()">New offer</button></div>
+      <div class="grid" style="grid-template-columns:1fr 1fr;gap:14px">
+        <div class="panel"><h3 style="margin-top:0">Offers</h3><table id="offerTable"><tbody></tbody></table></div>
+        <div class="panel"><h3 style="margin-top:0">Combos</h3><table id="comboTable"><tbody></tbody></table></div>
+      </div>
+      <h2 style="margin-top:20px">Loyalty customers</h2>
+      <div class="panel"><table id="custTable"><tbody></tbody></table></div>
+    </section>
+
+    <section id="v-reports" class="hidden">
+      <div class="toolbar"><h2 style="margin:0">Reports</h2>
+        <input type="month" id="pnlMonth" onchange="loadPnl()">
+        <button style="background:#38bdf822;color:#38bdf8" onclick="downloadGst()">Download GSTR-1 CSV</button></div>
+      <div class="grid" style="grid-template-columns:1fr 1fr;gap:14px">
+        <div class="panel"><h3 style="margin-top:0">Profit &amp; Loss</h3><table id="pnlTable"><tbody></tbody></table></div>
+        <div class="panel"><h3 style="margin-top:0">Last 14 days</h3><table id="dailyTable"><tbody></tbody></table></div>
+      </div>
+      <h2 style="margin-top:20px">Item performance</h2>
+      <div class="panel"><table id="itemTable"><tbody></tbody></table></div>
+      <h2 style="margin-top:20px">Audit log</h2>
+      <div class="panel"><table id="auditTable"><tbody></tbody></table></div>
+    </section>
+
+    <section id="v-admin" class="hidden">
+      <h2>Overheads &amp; salaries</h2>
+      <div class="toolbar"><input type="month" id="adminMonth" onchange="loadAdmin()">
+        <button style="background:var(--accent);color:#111;font-weight:700" onclick="seedAdminDefaults()">Load standard overheads</button></div>
+      <div class="grid" style="grid-template-columns:1fr 1fr;gap:14px">
+        <div class="panel"><h3 style="margin-top:0">Overheads</h3><table id="ohTable"><tbody></tbody></table></div>
+        <div class="panel"><h3 style="margin-top:0">Salaries</h3><table id="salTable"><tbody></tbody></table></div>
+      </div>
+      <h2 style="margin-top:20px">Staff accounts</h2>
+      <div class="panel"><table id="userTable"><tbody></tbody></table></div>
+    </section>
+  </main>
+</div>
+<script src="/static/app.js"></script>
+</body>
+</html>

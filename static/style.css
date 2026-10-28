@@ -1,0 +1,59 @@
+:root{--bg:#0f172a;--panel:#1e293b;--panel2:#273449;--line:#334155;--txt:#e2e8f0;
+--muted:#94a3b8;--accent:#f59e0b;--green:#22c55e;--red:#ef4444;--blue:#38bdf8}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--txt)}
+button{font:inherit;cursor:pointer;border:none;border-radius:8px;padding:8px 14px}
+input,select{font:inherit;background:#0b1220;color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.hidden{display:none!important}
+/* login */
+#login{display:flex;align-items:center;justify-content:center;min-height:100vh}
+#login .card{background:var(--panel);padding:32px;border-radius:16px;width:340px;box-shadow:0 20px 50px #0008}
+#login h1{margin:0 0 4px;font-size:22px}#login p{margin:0 0 20px;color:var(--muted);font-size:13px}
+#login input{width:100%;margin-bottom:12px}
+#login button{width:100%;background:var(--accent);color:#111;font-weight:700}
+.err{color:var(--red);font-size:13px;margin-top:8px;min-height:16px}
+/* shell */
+header{display:flex;align-items:center;gap:16px;padding:10px 18px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10;flex-wrap:wrap}
+header .brand{font-weight:800;letter-spacing:.3px}
+nav{display:flex;gap:6px;flex-wrap:wrap}
+nav button{background:transparent;color:var(--muted);padding:8px 12px}
+nav button.active{background:var(--panel2);color:var(--txt)}
+header .who{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+main{padding:18px;max-width:1400px;margin:0 auto}
+h2{margin:0 0 14px;font-size:18px}
+.grid{display:grid;gap:12px}
+.cards{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+.kpi .l{font-size:12px;color:var(--muted)}.kpi .v{font-size:22px;font-weight:800;margin-top:6px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line)}
+th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.4px}
+tr:hover td{background:#ffffff08}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+/* billing */
+.bill-wrap{display:grid;grid-template-columns:1fr 340px;gap:14px;align-items:start}
+.dishgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;max-height:64vh;overflow:auto;padding-right:4px}
+.dish{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px;cursor:pointer;transition:.12s}
+.dish:hover{border-color:var(--accent);transform:translateY(-1px)}
+.dish .n{font-weight:700;font-size:13px}.dish .m{font-size:11px;color:var(--muted);margin-top:2px}
+.dish .p{color:var(--accent);font-weight:700;margin-top:6px;font-size:13px}
+.cart{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;position:sticky;top:76px}
+.cart h3{margin:0 0 10px;font-size:15px}
+.cart .row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0}
+.cart .tot{border-top:1px solid var(--line);margin-top:8px;padding-top:8px;font-weight:800}
+.cart .tot .row{font-size:15px}
+.qbtn{background:#ffffff12;color:var(--txt);padding:2px 8px;border-radius:6px}
+.charge{width:100%;background:var(--green);color:#06210f;font-weight:800;padding:12px;margin-top:10px}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700}
+.b-ok{background:#22c55e22;color:var(--green)}.b-low{background:#f59e0b22;color:var(--accent)}
+.b-reorder{background:#ef444422;color:var(--red)}.b-out{background:#ef444433;color:var(--red)}
+.b-veg{background:#22c55e22;color:var(--green)}.b-nv{background:#ef444422;color:var(--red)}
+.toolbar{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.toolbar input{min-width:220px}
+.muted{color:var(--muted);font-size:12px}
+.receipt{background:#fff;color:#111;padding:18px;border-radius:10px;font-family:ui-monospace,monospace;font-size:12.5px;max-width:320px}
+.receipt h4{text-align:center;margin:0 0 4px}
+.receipt .line{border-top:1px dashed #999;margin:8px 0}
+.receipt .r{display:flex;justify-content:space-between}
+@media(max-width:820px){.bill-wrap{grid-template-columns:1fr}.cart{position:static}}

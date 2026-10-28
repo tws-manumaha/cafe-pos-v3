@@ -1,0 +1,20 @@
+# /etc/systemd/system/cafe-pos.service
+[Unit]
+Description=Cafe POS (FastAPI/uvicorn)
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=cafepos
+Group=cafepos
+WorkingDirectory=/opt/cafe-pos
+EnvironmentFile=/opt/cafe-pos/.env
+ExecStart=/opt/cafe-pos/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 2
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target
