@@ -1,0 +1,9 @@
+fastapi>=0.110
+uvicorn[standard]>=0.29
+SQLAlchemy>=2.0
+pydantic>=2.6
+PyJWT>=2.8
+python-multipart>=0.0.9
+# --- database drivers (install the one you use) ---
+# psycopg2-binary>=2.9        # PostgreSQL
+# pyodbc>=5.1                 # Microsoft SQL Server
